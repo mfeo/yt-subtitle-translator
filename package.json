@@ -1,0 +1,17 @@
+{
+  "name": "yt-subtitle-translator",
+  "version": "1.0.0",
+  "description": "YouTube Real-Time Translated Subtitles Chrome Extension",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bun run build.ts",
+    "watch": "bun run build.ts --watch",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/chrome": "^0.1.38",
+    "typescript": "^5"
+  }
+}

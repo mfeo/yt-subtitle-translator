@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube 字幕翻譯器</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="header">
+    <h1>YT 字幕翻譯器</h1>
+    <div class="toggle-row">
+      <span style="font-size:12px;color:#aaa">啟用</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="enabled" checked />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- General Settings -->
+  <div class="section">
+    <div class="section-title">翻譯設定</div>
+
+    <div class="field">
+      <label for="target-lang">目標語言</label>
+      <select id="target-lang">
+        <option value="zh-TW">繁體中文 (zh-TW)</option>
+        <option value="zh-CN">簡體中文 (zh-CN)</option>
+        <option value="ja">日語 (ja)</option>
+        <option value="ko">韓語 (ko)</option>
+        <option value="en">英語 (en)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="backend">翻譯後端</label>
+      <select id="backend">
+        <option value="ollama">Ollama LLM (本地)</option>
+        <option value="youtube-native">YouTube 原生翻譯</option>
+        <option value="cloud">雲端 API (DeepL / OpenAI)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ollama Section -->
+  <div class="section" id="ollama-section">
+    <div class="section-title">Ollama 設定</div>
+    <div class="field">
+      <label for="ollama-host">Ollama 主機</label>
+      <input type="text" id="ollama-host" value="http://localhost:11434" placeholder="http://localhost:11434" />
+    </div>
+    <div class="field">
+      <label for="ollama-model">翻譯模型</label>
+      <input type="text" id="ollama-model" value="qwen2.5:3b" placeholder="qwen2.5:3b" />
+    </div>
+  </div>
+
+  <!-- Cloud Section -->
+  <div class="section" id="cloud-section" hidden>
+    <div class="section-title">雲端 API 設定</div>
+    <div class="field">
+      <label for="cloud-provider">服務商</label>
+      <select id="cloud-provider">
+        <option value="deepl">DeepL</option>
+        <option value="openai">OpenAI GPT-4o mini</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="cloud-api-key">API 金鑰</label>
+      <input type="password" id="cloud-api-key" placeholder="輸入 API 金鑰" />
+    </div>
+  </div>
+
+  <!-- Whisper STT Section -->
+  <div class="section">
+    <div class="section-title">語音辨識 (無字幕影片)</div>
+    <div class="field">
+      <label for="whisper-provider">Whisper 提供者</label>
+      <select id="whisper-provider">
+        <option value="whisper-cpp">whisper.cpp (本地)</option>
+        <option value="groq">Groq API (免費)</option>
+        <option value="ollama-whisper">Ollama Whisper</option>
+      </select>
+    </div>
+    <div class="field" id="whisper-host-row">
+      <label for="whisper-host">whisper.cpp 主機</label>
+      <input type="text" id="whisper-host" value="http://localhost:8080" placeholder="http://localhost:8080" />
+    </div>
+    <div class="field" id="groq-key-row" hidden>
+      <label for="groq-api-key">Groq API 金鑰</label>
+      <input type="password" id="groq-api-key" placeholder="輸入 Groq API 金鑰" />
+    </div>
+  </div>
+
+  <!-- Display Section -->
+  <div class="section">
+    <div class="section-title">顯示設定</div>
+    <div class="field">
+      <label for="font-size">字體大小</label>
+      <select id="font-size">
+        <option value="small">小</option>
+        <option value="medium" selected>中</option>
+        <option value="large">大</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="opacity">背景透明度: <span id="opacity-val">0.85</span></label>
+      <input type="range" id="opacity" min="0.2" max="1" step="0.05" value="0.85"
+        oninput="document.getElementById('opacity-val').textContent = this.value" />
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button id="test-btn">測試連線</button>
+    <button id="save-btn">儲存設定</button>
+  </div>
+
+  <div id="status-msg" class="status-neutral"></div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

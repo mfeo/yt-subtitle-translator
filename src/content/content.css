@@ -1,0 +1,47 @@
+#yt-subtitle-overlay {
+  position: fixed;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  max-width: 80vw;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+#yt-subtitle-overlay.yt-subtitle-hidden {
+  opacity: 0;
+}
+
+#yt-subtitle-overlay .yt-subtitle-text {
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  font-size: 18px;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", "Heiti TC", sans-serif;
+  line-height: 1.6;
+  padding: 6px 16px;
+  border-radius: 4px;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  letter-spacing: 0.02em;
+}
+
+#yt-subtitle-overlay.yt-subtitle-partial .yt-subtitle-text {
+  opacity: 0.7;
+}
+
+/* Small font */
+#yt-subtitle-overlay.font-small .yt-subtitle-text {
+  font-size: 14px;
+}
+
+/* Medium font (default) */
+#yt-subtitle-overlay.font-medium .yt-subtitle-text {
+  font-size: 18px;
+}
+
+/* Large font */
+#yt-subtitle-overlay.font-large .yt-subtitle-text {
+  font-size: 22px;
+}

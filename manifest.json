@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Real-Time Translated Subtitles",
+  "version": "1.0.0",
+  "description": "Translate YouTube subtitles into Traditional Chinese in real-time using Ollama LLM.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "tabCapture",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:11434/*",
+    "http://localhost:8080/*",
+    "https://api.groq.com/*",
+    "https://api.deepl.com/*",
+    "https://api.openai.com/*",
+    "https://*.youtube.com/*"
+  ],
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*", "https://youtube.com/*"],
+      "js": ["dist/content.js"],
+      "css": ["dist/content.css"],
+      "run_at": "document_idle",
+      "world": "ISOLATED"
+    }
+  ],
+  "action": {
+    "default_popup": "dist/popup.html",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icon-16.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "cors_rules",
+        "enabled": true,
+        "path": "dist/cors_rules.json"
+      }
+    ]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["dist/injected.js"],
+      "matches": ["https://www.youtube.com/*", "https://youtube.com/*"]
+    }
+  ]
+}
