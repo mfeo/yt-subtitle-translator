@@ -29,6 +29,7 @@ whisper-run: (model model_name)
 whisper-run-cuda: (model model_name)
     podman run --rm -p {{ whisper_port }}:8080 \
       --device nvidia.com/gpu=all \
+      -e LD_LIBRARY_PATH=/usr/lib/wsl/lib:$(ls -d /usr/lib/wsl/drivers/*/ 2>/dev/null | tr '\n' ':') \
       -v ./{{ model_dir }}:/models \
       {{ whisper_image }}-cuda
 
