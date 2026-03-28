@@ -82,12 +82,12 @@ export class TranslationOverlay {
     const fontSize = FONT_SIZE_MAP[this.options.fontSize];
 
     this.container.style.cssText = `
-      position: fixed;
+      position: absolute;
       bottom: 10%;
       left: 50%;
       transform: translateX(-50%);
       z-index: 9999;
-      max-width: 80vw;
+      max-width: 80%;
       pointer-events: none;
     `;
 
@@ -108,20 +108,18 @@ export class TranslationOverlay {
   }
 
   private attach(): void {
-    // During fullscreen, the video element's container holds the UI
-    const player = document.querySelector(".html5-video-player") ?? document.body;
-    player.appendChild(this.container!);
+    const player = document.querySelector(".html5-video-player") as HTMLElement | null;
+    const parent = player ?? document.body;
+    if (player) {
+      const pos = getComputedStyle(player).position;
+      if (pos === "static") player.style.position = "relative";
+    }
+    parent.appendChild(this.container!);
     this.reposition();
   }
 
   private reposition(): void {
-    if (!this.container) return;
-    const captionWindow = document.querySelector(".ytp-caption-window-container");
-    if (captionWindow) {
-      const rect = captionWindow.getBoundingClientRect();
-      this.container.style.bottom = `${window.innerHeight - rect.top + 8}px`;
-      this.container.style.top = "auto";
-    }
+    // Position is handled by CSS (bottom: 10% relative to the player container)
   }
 
   private repositionDebounced = (): void => {

@@ -1,27 +1,5 @@
 import type { CaptionTrack, TimedTextEvent, TimedTextTrack } from "../types/index.js";
 
-// Injected into MAIN world to access ytInitialPlayerResponse
-const INJECTOR_SCRIPT = `
-(function() {
-  try {
-    const data = window.ytInitialPlayerResponse;
-    if (!data) return;
-    const tracks = data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-    if (!tracks) return;
-    window.postMessage({
-      type: '__YT_CAPTION_TRACKS__',
-      tracks: tracks.map(t => ({
-        baseUrl: t.baseUrl,
-        name: t.name?.simpleText || '',
-        vssId: t.vssId || '',
-        languageCode: t.languageCode || '',
-        isDefault: t.isDefault || false,
-      }))
-    }, '*');
-  } catch(e) {}
-})();
-`;
-
 export async function fetchCaptionTracks(): Promise<CaptionTrack[]> {
   return new Promise((resolve) => {
     const timeout = setTimeout(() => resolve([]), 5000);
@@ -41,9 +19,9 @@ export async function fetchCaptionTracks(): Promise<CaptionTrack[]> {
 
     window.addEventListener("message", handler);
 
-    // Inject into page (MAIN world) to read ytInitialPlayerResponse
+    // Inject external script into MAIN world to read ytInitialPlayerResponse
     const script = document.createElement("script");
-    script.textContent = INJECTOR_SCRIPT;
+    script.src = chrome.runtime.getURL("dist/injected.js");
     (document.head ?? document.documentElement).appendChild(script);
     script.remove();
   });

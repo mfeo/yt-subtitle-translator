@@ -18,6 +18,9 @@ A Chrome extension that translates YouTube subtitles in real-time using a three-
 - [Ollama](https://ollama.com) running locally with the `qwen2.5:3b` model pulled:
   ```bash
   ollama pull qwen2.5:3b
+  # Verify Ollama is running
+  curl http://localhost:11434/api/tags
+  # Expected: JSON listing pulled models, not a connection error
   ```
 - *(Optional)* [whisper.cpp server](https://github.com/ggerganov/whisper.cpp) at `http://localhost:8080` for captionless videos — see [whisper.cpp Setup](#whispercpp-setup) below
 - *(Optional)* Groq API key for cloud-based Whisper transcription
@@ -32,7 +35,7 @@ bun install
 bun run build
 
 # 3. Load in Chrome
-#    Open chrome://extensions → enable Developer mode → "Load unpacked" → select dist/
+#    Open chrome://extensions → enable Developer mode → "Load unpacked" → select this project root
 
 # 4. Open any YouTube video and click the extension icon to configure
 ```

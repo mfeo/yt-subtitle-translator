@@ -92,6 +92,10 @@ async function init(): Promise<void> {
   const opacityInput = $input("opacity");
   if (fontSizeSel) fontSizeSel.value = s.display.fontSize;
   if (opacityInput) opacityInput.value = String(s.display.opacity);
+  const opacityVal = $("opacity-val");
+  opacityInput?.addEventListener("input", () => {
+    if (opacityVal) opacityVal.textContent = opacityInput.value;
+  });
 
   updateBackendVisibility(s.translationBackend);
   updateWhisperVisibility(s.whisper.provider);

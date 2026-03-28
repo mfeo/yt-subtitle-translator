@@ -17,6 +17,7 @@ const builds = [
   { entry: "src/content/index.ts", outName: "content.js" },
   { entry: "src/background/index.ts", outName: "background.js" },
   { entry: "src/popup/popup.ts", outName: "popup.js" },
+  { entry: "src/content/injected.ts", outName: "injected.js" },
 ];
 
 console.log("Building extension...");

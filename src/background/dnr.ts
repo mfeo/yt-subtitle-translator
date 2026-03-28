@@ -20,7 +20,7 @@ export const corsRules = [
     },
     condition: {
       urlFilter: "http://localhost:11434/*",
-      resourceTypes: ["xmlhttprequest", "fetch"],
+      resourceTypes: ["xmlhttprequest"],
     },
   },
   {
@@ -38,7 +38,7 @@ export const corsRules = [
     },
     condition: {
       urlFilter: "http://localhost:8080/*",
-      resourceTypes: ["xmlhttprequest", "fetch"],
+      resourceTypes: ["xmlhttprequest"],
     },
   },
 ];
