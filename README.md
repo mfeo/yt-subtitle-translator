@@ -64,7 +64,7 @@ Open the extension popup on any YouTube tab to configure:
 │  │  Layer 2: DOM Observer   │   │
 │  │  Layer 3: Audio Capture  │   │
 │  └───────────┬──────────────┘   │
-│              │ raw text          │
+│              │ raw text         │
 │  ┌───────────▼──────────────┐   │
 │  │  overlay.ts              │   │
 │  │  Subtitle overlay UI     │   │
@@ -173,11 +173,22 @@ Two setup options are available: a **container** approach (no compilation requir
 
 ### Using Podman / Docker
 
+> **Quick start with just:** If you have [just](https://github.com/casey/just) installed:
+> ```bash
+> just whisper-build   # build container
+> just whisper-run     # download model + start server
+> ```
+
 The official whisper.cpp container image includes curl and ffmpeg. Replace `podman` with `docker` if you are using Docker.
 
 #### 1. Download a model
 
 ```bash
+# With just (recommended)
+just model          # downloads ggml-small.bin
+just model base.en  # downloads a specific model
+
+# Manually
 mkdir -p models
 curl -L -o models/ggml-small.bin \
   https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin
