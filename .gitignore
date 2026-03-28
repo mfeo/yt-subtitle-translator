@@ -35,3 +35,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # whisper.cpp models (large binary files)
 models/
+
+# Chrome extension auto-generated metadata
+_metadata/
