@@ -82,7 +82,7 @@ writeFileSync(
 
 console.log("Copying static assets...");
 const assetsDir = resolve(__dir, "assets");
-const distAssetsDir = resolve(dist, "../assets");
+const distAssetsDir = resolve(dist, "assets");
 if (existsSync(assetsDir)) {
   mkdirSync(distAssetsDir, { recursive: true });
   for (const file of readdirSync(assetsDir)) {
