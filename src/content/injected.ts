@@ -15,12 +15,14 @@
             name?: { simpleText?: string };
             vssId?: string;
             languageCode?: string;
+            kind?: string;
             isDefault?: boolean;
           }) => ({
             baseUrl: t.baseUrl,
             name: t.name?.simpleText || "",
             vssId: t.vssId || "",
             languageCode: t.languageCode || "",
+            kind: t.kind || "",
             isDefault: t.isDefault || false,
           })
         ),

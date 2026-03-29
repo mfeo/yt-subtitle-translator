@@ -8,7 +8,7 @@ import { DOMObserver } from "./dom-observer.js";
 import { AudioCapture } from "./audio-capture.js";
 import type { CaptionSource, TimedTextEvent } from "../types/index.js";
 
-type CaptionCallback = (text: string, lang: string | null, source: CaptionSource) => void;
+type CaptionCallback = (text: string, lang: string | null, source: CaptionSource, isScrolling: boolean) => void;
 
 const POLL_INTERVAL_MS = 250; // video timeupdate poll interval fallback
 
@@ -16,6 +16,7 @@ export class CaptionSourceManager {
   private activeSource: CaptionSource | null = null;
   private timedTextEvents: TimedTextEvent[] = [];
   private timedTextLang: string | null = null;
+  private timedTextIsScrolling = false;
   private domObserver: DOMObserver | null = null;
   private audioCapture: AudioCapture | null = null;
   private pollInterval: ReturnType<typeof setInterval> | null = null;
@@ -36,6 +37,8 @@ export class CaptionSourceManager {
         if (timedText && timedText.events.length > 0) {
           this.timedTextEvents = timedText.events;
           this.timedTextLang = track.languageCode;
+          this.timedTextIsScrolling =
+            track.kind === "asr" || track.vssId.startsWith("a.");
           this.startTimedTextPolling();
           this.activeSource = "timedtext";
           return "timedtext";
@@ -46,8 +49,8 @@ export class CaptionSourceManager {
     }
 
     // --- Layer 2: DOM Observer ---
-    this.domObserver = new DOMObserver((text) => {
-      this.callback(text, null, "dom");
+    this.domObserver = new DOMObserver((text, isScrolling) => {
+      this.callback(text, null, "dom", isScrolling);
     });
     if (this.domObserver.start()) {
       this.activeSource = "dom";
@@ -57,7 +60,7 @@ export class CaptionSourceManager {
     // --- Layer 3: Audio Capture + Whisper ---
     try {
       this.audioCapture = new AudioCapture((text) => {
-        this.callback(text, null, "whisper");
+        this.callback(text, null, "whisper", false);
       });
       await this.audioCapture.start();
       this.activeSource = "whisper";
@@ -100,7 +103,7 @@ export class CaptionSourceManager {
     const text = findCurrentCaption(this.timedTextEvents, currentMs);
     if (text && text !== this.lastEmittedText) {
       this.lastEmittedText = text;
-      this.callback(text, this.timedTextLang, "timedtext");
+      this.callback(text, this.timedTextLang, "timedtext", this.timedTextIsScrolling);
     }
   };
 }

@@ -1,16 +1,16 @@
 import { debounce } from "../utils/debounce.js";
 
-type CaptionCallback = (text: string) => void;
+type CaptionCallback = (text: string, isScrolling: boolean) => void;
 
 export class DOMObserver {
   private observer: MutationObserver | null = null;
   private lastText = "";
   private callback: CaptionCallback;
 
-  private debouncedEmit = debounce((text: string) => {
+  private debouncedEmit = debounce((text: string, isScrolling: boolean) => {
     if (text && text !== this.lastText) {
       this.lastText = text;
-      this.callback(text);
+      this.callback(text, isScrolling);
     }
   }, 300);
 
@@ -24,7 +24,7 @@ export class DOMObserver {
 
     this.observer = new MutationObserver(() => {
       const text = this.extractText();
-      if (text) this.debouncedEmit(text);
+      if (text) this.debouncedEmit(text, this.isScrollingMode());
     });
 
     this.observer.observe(container, {
@@ -40,6 +40,10 @@ export class DOMObserver {
     this.observer?.disconnect();
     this.observer = null;
     this.lastText = "";
+  }
+
+  private isScrollingMode(): boolean {
+    return !!document.querySelector(".ytp-caption-window-rollup");
   }
 
   private extractText(): string {

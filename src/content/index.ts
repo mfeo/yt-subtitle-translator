@@ -57,8 +57,8 @@ async function initialize(): Promise<void> {
     (raw) => overlay?.show(raw, true)
   );
 
-  manager = new CaptionSourceManager((text, lang, source) =>
-    stabilizer!.feed(text, lang, source)
+  manager = new CaptionSourceManager((text, lang, source, isScrolling) =>
+    stabilizer!.feed(text, lang, source, isScrolling)
   );
   activeSource = await manager.start();
   console.log(`[YT Translator] Caption source: ${activeSource}`);

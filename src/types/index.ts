@@ -16,6 +16,7 @@ export interface CaptionTrack {
   name: string;
   vssId: string;
   languageCode: string;
+  kind?: string; // "asr" = auto-generated/scrolling
   isDefault?: boolean;
 }
 

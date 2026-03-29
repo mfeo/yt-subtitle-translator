@@ -14,10 +14,7 @@ export class CaptionStabilizer {
     private readonly stabilizeDelayMs: number = 1200
   ) {}
 
-  feed(text: string, lang: string | null, source: CaptionSource): void {
-    const isScrolling = this.isRelatedCaption(text, this.lastFedText);
-    this.lastFedText = text;
-
+  feed(text: string, lang: string | null, source: CaptionSource, isScrolling: boolean): void {
     this.pendingText = text;
     this.pendingLang = lang;
     this.pendingSource = source;
@@ -28,7 +25,18 @@ export class CaptionStabilizer {
     }
 
     if (!isScrolling) {
-      // Completely different text (new sentence) — emit immediately
+      // Normal caption — already a complete sentence, emit immediately
+      this.lastFedText = text;
+      this.emitStable();
+      return;
+    }
+
+    // Scrolling caption — check similarity and debounce
+    const isRelated = this.isRelatedCaption(text, this.lastFedText);
+    this.lastFedText = text;
+
+    if (!isRelated) {
+      // Completely different text (new sentence starting) — emit immediately
       this.emitStable();
     } else {
       // Text is growing word-by-word — wait for it to settle
