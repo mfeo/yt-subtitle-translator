@@ -164,6 +164,15 @@ button:hover {
   border: 1px solid #1a4a7a;
 }
 
+#capture-btn {
+  width: 100%;
+  margin-top: 10px;
+  background: #0f3460;
+  color: #e0e0e0;
+  border: 1px solid #1a4a7a;
+  flex: none;
+}
+
 /* Status */
 #status-msg {
   padding: 0 16px 10px;
