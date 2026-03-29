@@ -6,6 +6,14 @@ import type { Settings } from "../types/settings.js";
 import type { CaptionSource } from "../types/index.js";
 
 const LOCAL_CACHE_MAX = 100;
+
+function isContextValid(): boolean {
+  try {
+    return !!chrome.runtime?.id;
+  } catch {
+    return false;
+  }
+}
 const MIN_TRANSLATE_INTERVAL_MS = 2000;
 
 let manager: CaptionSourceManager | null = null;
@@ -20,14 +28,18 @@ const localCache = new Map<string, string>();
 
 async function loadSettings(): Promise<Settings> {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ type: "GET_SETTINGS" }, (response: unknown) => {
-      if (chrome.runtime.lastError) {
-        resolve(getDefaultSettings());
-        return;
-      }
-      const resp = response as { success: boolean; data: Settings };
-      resolve(resp?.success ? resp.data : getDefaultSettings());
-    });
+    try {
+      chrome.runtime.sendMessage({ type: "GET_SETTINGS" }, (response: unknown) => {
+        if (chrome.runtime.lastError) {
+          resolve(getDefaultSettings());
+          return;
+        }
+        const resp = response as { success: boolean; data: Settings };
+        resolve(resp?.success ? resp.data : getDefaultSettings());
+      });
+    } catch {
+      resolve(getDefaultSettings());
+    }
   });
 }
 
@@ -52,20 +64,19 @@ async function initialize(): Promise<void> {
   });
   overlay.mount();
 
-  stabilizer = new CaptionStabilizer(
-    onCaption,
-    (raw) => overlay?.show(raw, true)
-  );
+  stabilizer = new CaptionStabilizer(onCaption);
 
   manager = new CaptionSourceManager((text, lang, source, isScrolling) =>
     stabilizer!.feed(text, lang, source, isScrolling)
   );
   activeSource = await manager.start();
-  console.log(`[YT Translator] Caption source: ${activeSource}`);
+  if (activeSource) {
+    console.info(`[YT Translator] Active caption source: ${activeSource}`);
+  }
 }
 
 function onCaption(text: string, lang: string | null, _source: CaptionSource): void {
-  if (!overlay || !settings) return;
+  if (!overlay || !settings || !isContextValid()) return;
 
   // Check content-side cache before opening a translation port
   const cacheKey = `${text}|${settings.targetLang}`;
@@ -84,7 +95,13 @@ function onCaption(text: string, lang: string | null, _source: CaptionSource): v
   const ctrl = abortManager.create("translate");
 
   // Use streaming port for progressive display
-  const port = chrome.runtime.connect({ name: "translation-stream" });
+  let port: chrome.runtime.Port;
+  try {
+    port = chrome.runtime.connect({ name: "translation-stream" });
+  } catch {
+    // Extension context invalidated (e.g. after reload) — silently stop
+    return;
+  }
 
   port.onMessage.addListener((msg: unknown) => {
     const message = msg as {
@@ -146,6 +163,7 @@ function cleanup(): void {
 
 // Handle YouTube SPA navigation
 document.addEventListener("yt-navigate-finish", () => {
+  if (!isContextValid()) return;
   cleanup();
   // Small delay to let YouTube load the new page
   setTimeout(initialize, 1000);
@@ -153,6 +171,7 @@ document.addEventListener("yt-navigate-finish", () => {
 
 // Listen for settings changes to re-initialize
 chrome.storage.onChanged.addListener((_changes, area) => {
+  if (!isContextValid()) return;
   if (area !== "sync") return;
   cleanup();
   setTimeout(initialize, 200);

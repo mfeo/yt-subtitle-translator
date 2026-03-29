@@ -27,7 +27,7 @@ export class CaptionSourceManager {
     this.callback = callback;
   }
 
-  async start(): Promise<CaptionSource> {
+  async start(): Promise<CaptionSource | null> {
     // --- Layer 1: TimedText API ---
     try {
       const tracks = await fetchCaptionTracks();
@@ -41,11 +41,13 @@ export class CaptionSourceManager {
             track.kind === "asr" || track.vssId.startsWith("a.");
           this.startTimedTextPolling();
           this.activeSource = "timedtext";
+          console.info("[CaptionSource] Using TimedText API (scrolling=%s)", this.timedTextIsScrolling);
           return "timedtext";
         }
       }
+      console.info("[CaptionSource] TimedText: no caption tracks available");
     } catch (err) {
-      console.warn("[CaptionSource] TimedText failed:", err);
+      console.info("[CaptionSource] TimedText: unavailable —", (err as Error).message ?? err);
     }
 
     // --- Layer 2: DOM Observer ---
@@ -54,8 +56,10 @@ export class CaptionSourceManager {
     });
     if (this.domObserver.start()) {
       this.activeSource = "dom";
+      console.info("[CaptionSource] Using DOM Observer");
       return "dom";
     }
+    console.info("[CaptionSource] DOM Observer: caption container not found");
 
     // --- Layer 3: Audio Capture + Whisper ---
     try {
@@ -64,12 +68,14 @@ export class CaptionSourceManager {
       });
       await this.audioCapture.start();
       this.activeSource = "whisper";
+      console.info("[CaptionSource] Using Audio Capture + Whisper");
       return "whisper";
-    } catch (err) {
-      console.warn("[CaptionSource] Audio capture failed:", err);
+    } catch {
+      console.info("[CaptionSource] Audio Capture: not available");
     }
 
-    return "whisper"; // best effort
+    console.warn("[CaptionSource] All caption sources failed — no subtitles will be translated");
+    return null;
   }
 
   stop(): void {
