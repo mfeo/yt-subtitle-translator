@@ -161,6 +161,14 @@ function cleanup(): void {
   activeSource = null;
 }
 
+// Handle audio capture stream ID from popup
+chrome.runtime.onMessage.addListener((msg: unknown) => {
+  const message = msg as { type: string; streamId?: string };
+  if (message.type !== "TAB_CAPTURE_STREAM_ID" || !message.streamId) return;
+  if (!isContextValid() || !manager) return;
+  manager.startAudioCapture(message.streamId);
+});
+
 // Handle YouTube SPA navigation
 document.addEventListener("yt-navigate-finish", () => {
   if (!isContextValid()) return;

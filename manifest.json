@@ -5,6 +5,7 @@
   "description": "Translate YouTube subtitles into Traditional Chinese in real-time using Ollama LLM.",
   "permissions": [
     "activeTab",
+    "tabs",
     "storage",
     "declarativeNetRequest",
     "declarativeNetRequestWithHostAccess",

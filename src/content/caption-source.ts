@@ -61,21 +61,23 @@ export class CaptionSourceManager {
     }
     console.info("[CaptionSource] DOM Observer: caption container not found");
 
-    // --- Layer 3: Audio Capture + Whisper ---
+    console.info("[CaptionSource] Waiting for audio capture — click 🎙 in the popup to start");
+    return null;
+  }
+
+  async startAudioCapture(streamId: string): Promise<boolean> {
     try {
       this.audioCapture = new AudioCapture((text) => {
         this.callback(text, null, "whisper", false);
       });
-      await this.audioCapture.start();
+      await this.audioCapture.startWithStreamId(streamId);
       this.activeSource = "whisper";
       console.info("[CaptionSource] Using Audio Capture + Whisper");
-      return "whisper";
-    } catch {
-      console.info("[CaptionSource] Audio Capture: not available");
+      return true;
+    } catch (err) {
+      console.info("[CaptionSource] Audio Capture failed:", (err as Error).message);
+      return false;
     }
-
-    console.warn("[CaptionSource] All caption sources failed — no subtitles will be translated");
-    return null;
   }
 
   stop(): void {

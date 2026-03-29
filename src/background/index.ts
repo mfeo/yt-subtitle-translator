@@ -72,7 +72,7 @@ chrome.runtime.onConnect.addListener((port) => {
 
 // Regular message handler
 chrome.runtime.onMessage.addListener(
-  (msg: unknown, _sender, sendResponse: (response: unknown) => void) => {
+  (msg: unknown, sender, sendResponse: (response: unknown) => void) => {
     const message = msg as ExtensionMessage;
 
     switch (message.type) {

@@ -17,8 +17,19 @@ export class AudioCapture {
   }
 
   async start(): Promise<void> {
-    // Request tab audio capture via service worker relay
-    const stream = await this.requestTabCapture();
+    throw new Error("Use startWithStreamId(streamId) instead — call from popup with user gesture");
+  }
+
+  async startWithStreamId(streamId: string): Promise<void> {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        mandatory: {
+          chromeMediaSource: "tab",
+          chromeMediaSourceId: streamId,
+        },
+      } as MediaTrackConstraints,
+      video: false,
+    });
     if (!stream) throw new Error("Tab capture not available");
 
     this.stream = stream;
@@ -63,38 +74,6 @@ export class AudioCapture {
     this.stream = null;
     this.audioContext?.close();
     this.audioContext = null;
-  }
-
-  private async requestTabCapture(): Promise<MediaStream | null> {
-    return new Promise((resolve) => {
-      chrome.runtime.sendMessage(
-        { type: "REQUEST_TAB_CAPTURE" },
-        (response: unknown) => {
-          if (chrome.runtime.lastError || !response) {
-            resolve(null);
-            return;
-          }
-          const resp = response as { success: boolean; streamId?: string };
-          if (!resp.success || !resp.streamId) {
-            resolve(null);
-            return;
-          }
-          // Use getUserMedia with chromeMediaSourceId
-          navigator.mediaDevices
-            .getUserMedia({
-              audio: {
-                mandatory: {
-                  chromeMediaSource: "tab",
-                  chromeMediaSourceId: resp.streamId,
-                },
-              } as MediaTrackConstraints,
-              video: false,
-            })
-            .then((stream) => resolve(stream))
-            .catch(() => resolve(null));
-        }
-      );
-    });
   }
 
   private sendAudioChunk(audioData: string, mimeType: string): void {

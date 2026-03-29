@@ -135,6 +135,22 @@ async function init(): Promise<void> {
     const backend = (backendSel?.value ?? "ollama") as TranslationBackendName;
     await testConnection(backend);
   });
+
+  $("capture-btn")?.addEventListener("click", async () => {
+    setStatus("啟動語音辨識中…");
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab?.id) {
+        setStatus("無法取得目前分頁", false);
+        return;
+      }
+      const streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tab.id });
+      await chrome.tabs.sendMessage(tab.id, { type: "TAB_CAPTURE_STREAM_ID", streamId });
+      setStatus("語音辨識已啟動 ✓", true);
+    } catch (err) {
+      setStatus(`啟動失敗: ${err instanceof Error ? err.message : String(err)}`, false);
+    }
+  });
 }
 
 function updateBackendVisibility(backend: TranslationBackendName): void {

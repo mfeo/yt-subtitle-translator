@@ -11,7 +11,8 @@ export type MessageType =
   | "TEST_CONNECTION"
   | "AUDIO_CHUNK"
   | "STT_RESULT"
-  | "STATUS_UPDATE";
+  | "STATUS_UPDATE"
+  | "TAB_CAPTURE_STREAM_ID";
 
 export interface TranslateRequestMessage {
   type: "TRANSLATE_REQUEST";
@@ -73,6 +74,11 @@ export interface StatusUpdateMessage {
   active: boolean;
 }
 
+export interface TabCaptureStreamIdMessage {
+  type: "TAB_CAPTURE_STREAM_ID";
+  streamId: string;
+}
+
 export type ExtensionMessage =
   | TranslateRequestMessage
   | TranslateResponseMessage
@@ -83,7 +89,8 @@ export type ExtensionMessage =
   | TestConnectionMessage
   | AudioChunkMessage
   | SttResultMessage
-  | StatusUpdateMessage;
+  | StatusUpdateMessage
+  | TabCaptureStreamIdMessage;
 
 export type MessageResponse<T = unknown> =
   | { success: true; data: T }
