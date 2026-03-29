@@ -39,7 +39,8 @@ async function transcribeWhisperCpp(
   signal?: AbortSignal
 ): Promise<string> {
   const form = new FormData();
-  form.append("file", audio, "audio.webm");
+  const filename = audio.type === "audio/wav" ? "audio.wav" : "audio.webm";
+  form.append("file", audio, filename);
   form.append("response_format", "json");
 
   const resp = await fetch(`${host}/inference`, {

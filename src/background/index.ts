@@ -1,9 +1,21 @@
 import { Translator } from "./translator.js";
 import { transcribeAudio } from "./whisper.js";
-import type { ExtensionMessage } from "../types/messages.js";
+import type { ExtensionMessage, StartOffscreenCaptureMessage } from "../types/messages.js";
 import type { Settings } from "../types/settings.js";
 import { DEFAULT_SETTINGS } from "../types/settings.js";
 import { AbortManager } from "../utils/abort.js";
+
+async function ensureOffscreenDocument(): Promise<void> {
+  const existingContexts = await chrome.runtime.getContexts({
+    contextTypes: ["OFFSCREEN_DOCUMENT" as chrome.runtime.ContextType],
+  });
+  if (existingContexts.length > 0) return;
+  await chrome.offscreen.createDocument({
+    url: "dist/offscreen.html",
+    reasons: ["USER_MEDIA" as chrome.offscreen.Reason],
+    justification: "Tab audio capture for speech-to-text transcription",
+  });
+}
 
 let settings: Settings = { ...DEFAULT_SETTINGS };
 let translator = new Translator(settings);
@@ -121,18 +133,41 @@ chrome.runtime.onMessage.addListener(
       }
 
       case "AUDIO_CHUNK": {
-        const { audioData, mimeType } = message;
+        const { audioData, mimeType, tabId } = message;
         transcribeAudio(audioData, mimeType, settings.whisper)
           .then((text) => {
-            sendResponse({ success: true, data: { text } });
+            if (tabId) {
+              chrome.tabs.sendMessage(tabId, { type: "STT_RESULT", text });
+            }
+          })
+          .catch(() => {
+            // transcription failure is non-fatal, just skip this chunk
+          });
+        return false;
+      }
+
+      case "START_TAB_CAPTURE": {
+        const { streamId, tabId } = message as { type: string; streamId: string; tabId: number };
+        ensureOffscreenDocument()
+          .then(() => {
+            const fwd: StartOffscreenCaptureMessage = {
+              type: "START_OFFSCREEN_CAPTURE",
+              streamId,
+              tabId,
+            };
+            chrome.runtime.sendMessage(fwd);
+            sendResponse({ success: true });
           })
           .catch((err: unknown) => {
-            sendResponse({
-              success: false,
-              error: err instanceof Error ? err.message : String(err),
-            });
+            sendResponse({ success: false, error: err instanceof Error ? err.message : String(err) });
           });
         return true;
+      }
+
+      case "STOP_TAB_CAPTURE": {
+        chrome.runtime.sendMessage({ type: "STOP_OFFSCREEN_CAPTURE" });
+        chrome.offscreen.closeDocument().catch(() => {});
+        return false;
       }
 
       default:

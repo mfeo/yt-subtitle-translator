@@ -12,7 +12,10 @@ export type MessageType =
   | "AUDIO_CHUNK"
   | "STT_RESULT"
   | "STATUS_UPDATE"
-  | "TAB_CAPTURE_STREAM_ID";
+  | "START_TAB_CAPTURE"
+  | "STOP_TAB_CAPTURE"
+  | "START_OFFSCREEN_CAPTURE"
+  | "STOP_OFFSCREEN_CAPTURE";
 
 export interface TranslateRequestMessage {
   type: "TRANSLATE_REQUEST";
@@ -74,9 +77,24 @@ export interface StatusUpdateMessage {
   active: boolean;
 }
 
-export interface TabCaptureStreamIdMessage {
-  type: "TAB_CAPTURE_STREAM_ID";
+export interface StartTabCaptureMessage {
+  type: "START_TAB_CAPTURE";
   streamId: string;
+  tabId: number;
+}
+
+export interface StopTabCaptureMessage {
+  type: "STOP_TAB_CAPTURE";
+}
+
+export interface StartOffscreenCaptureMessage {
+  type: "START_OFFSCREEN_CAPTURE";
+  streamId: string;
+  tabId: number;
+}
+
+export interface StopOffscreenCaptureMessage {
+  type: "STOP_OFFSCREEN_CAPTURE";
 }
 
 export type ExtensionMessage =
@@ -90,7 +108,10 @@ export type ExtensionMessage =
   | AudioChunkMessage
   | SttResultMessage
   | StatusUpdateMessage
-  | TabCaptureStreamIdMessage;
+  | StartTabCaptureMessage
+  | StopTabCaptureMessage
+  | StartOffscreenCaptureMessage
+  | StopOffscreenCaptureMessage;
 
 export type MessageResponse<T = unknown> =
   | { success: true; data: T }

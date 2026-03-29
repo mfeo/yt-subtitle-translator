@@ -10,7 +10,8 @@
     "declarativeNetRequest",
     "declarativeNetRequestWithHostAccess",
     "tabCapture",
-    "scripting"
+    "scripting",
+    "offscreen"
   ],
   "host_permissions": [
     "http://localhost:11434/*",

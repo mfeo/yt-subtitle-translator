@@ -145,8 +145,17 @@ async function init(): Promise<void> {
         return;
       }
       const streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tab.id });
-      await chrome.tabs.sendMessage(tab.id, { type: "TAB_CAPTURE_STREAM_ID", streamId });
-      setStatus("語音辨識已啟動 ✓", true);
+      chrome.runtime.sendMessage(
+        { type: "START_TAB_CAPTURE", streamId, tabId: tab.id },
+        (resp: unknown) => {
+          const r = resp as { success: boolean; error?: string };
+          if (r?.success) {
+            setStatus("語音辨識已啟動 ✓", true);
+          } else {
+            setStatus(`啟動失敗: ${r?.error ?? "unknown"}`, false);
+          }
+        }
+      );
     } catch (err) {
       setStatus(`啟動失敗: ${err instanceof Error ? err.message : String(err)}`, false);
     }

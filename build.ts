@@ -18,6 +18,7 @@ const builds = [
   { entry: "src/background/index.ts", outName: "background.js" },
   { entry: "src/popup/popup.ts", outName: "popup.js" },
   { entry: "src/content/injected.ts", outName: "injected.js" },
+  { entry: "src/offscreen/offscreen.ts", outName: "offscreen.js" },
 ];
 
 console.log("Building extension...");
@@ -70,6 +71,10 @@ copyFileSync(
 // Process popup.html — update script path and copy
 const popupHtml = await Bun.file(resolve(__dir, "src/popup/popup.html")).text();
 writeFileSync(resolve(dist, "popup.html"), popupHtml, "utf8");
+
+// Copy offscreen.html
+const offscreenHtml = await Bun.file(resolve(__dir, "src/offscreen/offscreen.html")).text();
+writeFileSync(resolve(dist, "offscreen.html"), offscreenHtml, "utf8");
 
 // Write CORS rules JSON (for declarativeNetRequest)
 writeFileSync(

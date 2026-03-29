@@ -5,7 +5,6 @@ import {
   selectBestTrack,
 } from "./timedtext-fetcher.js";
 import { DOMObserver } from "./dom-observer.js";
-import { AudioCapture } from "./audio-capture.js";
 import type { CaptionSource, TimedTextEvent } from "../types/index.js";
 
 type CaptionCallback = (text: string, lang: string | null, source: CaptionSource, isScrolling: boolean) => void;
@@ -18,7 +17,6 @@ export class CaptionSourceManager {
   private timedTextLang: string | null = null;
   private timedTextIsScrolling = false;
   private domObserver: DOMObserver | null = null;
-  private audioCapture: AudioCapture | null = null;
   private pollInterval: ReturnType<typeof setInterval> | null = null;
   private video: HTMLVideoElement | null = null;
   private callback: CaptionCallback;
@@ -65,21 +63,6 @@ export class CaptionSourceManager {
     return null;
   }
 
-  async startAudioCapture(streamId: string): Promise<boolean> {
-    try {
-      this.audioCapture = new AudioCapture((text) => {
-        this.callback(text, null, "whisper", false);
-      });
-      await this.audioCapture.startWithStreamId(streamId);
-      this.activeSource = "whisper";
-      console.info("[CaptionSource] Using Audio Capture + Whisper");
-      return true;
-    } catch (err) {
-      console.info("[CaptionSource] Audio Capture failed:", (err as Error).message);
-      return false;
-    }
-  }
-
   stop(): void {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
@@ -87,7 +70,6 @@ export class CaptionSourceManager {
     }
     this.video?.removeEventListener("timeupdate", this.onTimeUpdate);
     this.domObserver?.stop();
-    this.audioCapture?.stop();
     this.timedTextEvents = [];
     this.activeSource = null;
   }

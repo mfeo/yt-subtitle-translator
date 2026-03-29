@@ -159,14 +159,17 @@ function cleanup(): void {
   overlay = null;
   abortManager.abortAll();
   activeSource = null;
+  if (isContextValid()) {
+    chrome.runtime.sendMessage({ type: "STOP_TAB_CAPTURE" });
+  }
 }
 
-// Handle audio capture stream ID from popup
+// Handle STT results forwarded from background after Whisper transcription
 chrome.runtime.onMessage.addListener((msg: unknown) => {
-  const message = msg as { type: string; streamId?: string };
-  if (message.type !== "TAB_CAPTURE_STREAM_ID" || !message.streamId) return;
-  if (!isContextValid() || !manager) return;
-  manager.startAudioCapture(message.streamId);
+  const message = msg as { type: string; text?: string };
+  if (message.type !== "STT_RESULT" || !message.text) return;
+  if (!isContextValid() || !stabilizer) return;
+  stabilizer.feed(message.text, null, "whisper", false);
 });
 
 // Handle YouTube SPA navigation
