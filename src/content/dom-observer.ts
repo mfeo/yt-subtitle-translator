@@ -12,7 +12,7 @@ export class DOMObserver {
       this.lastText = text;
       this.callback(text);
     }
-  }, 150);
+  }, 300);
 
   constructor(callback: CaptionCallback) {
     this.callback = callback;

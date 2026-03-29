@@ -4,9 +4,9 @@ export interface OverlayOptions {
 }
 
 const FONT_SIZE_MAP = {
-  small: "14px",
-  medium: "18px",
-  large: "22px",
+  small: "16px",
+  medium: "21px",
+  large: "26px",
 } as const;
 
 export class TranslationOverlay {
@@ -32,6 +32,7 @@ export class TranslationOverlay {
     this.textEl.className = "yt-subtitle-text";
 
     this.container.appendChild(this.textEl);
+    this.container.classList.add("yt-subtitle-hidden");
     this.applyStyles();
     this.attach();
 
@@ -56,7 +57,9 @@ export class TranslationOverlay {
 
   show(text: string, partial = false): void {
     if (!this.textEl || !this.container) return;
-    this.textEl.textContent = partial ? text + " …" : text;
+    const displayText = partial ? text + " …" : text;
+    if (this.textEl.textContent === displayText) return;
+    this.textEl.textContent = displayText;
     this.container.classList.remove("yt-subtitle-hidden");
     this.container.classList.toggle("yt-subtitle-partial", partial);
     this.clearHideTimer();

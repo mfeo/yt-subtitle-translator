@@ -16,7 +16,7 @@
 #yt-subtitle-overlay .yt-subtitle-text {
   background: rgba(0, 0, 0, 0.85);
   color: #ffffff;
-  font-size: 18px;
+  font-size: 21px;
   font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", "Heiti TC", sans-serif;
   line-height: 1.6;
   padding: 6px 16px;
@@ -33,15 +33,15 @@
 
 /* Small font */
 #yt-subtitle-overlay.font-small .yt-subtitle-text {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* Medium font (default) */
 #yt-subtitle-overlay.font-medium .yt-subtitle-text {
-  font-size: 18px;
+  font-size: 21px;
 }
 
 /* Large font */
 #yt-subtitle-overlay.font-large .yt-subtitle-text {
-  font-size: 22px;
+  font-size: 26px;
 }

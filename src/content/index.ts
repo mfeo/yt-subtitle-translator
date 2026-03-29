@@ -1,15 +1,22 @@
 import { CaptionSourceManager } from "./caption-source.js";
+import { CaptionStabilizer } from "./caption-stabilizer.js";
 import { TranslationOverlay } from "./overlay.js";
 import { AbortManager } from "../utils/abort.js";
 import type { Settings } from "../types/settings.js";
 import type { CaptionSource } from "../types/index.js";
 
+const LOCAL_CACHE_MAX = 100;
+const MIN_TRANSLATE_INTERVAL_MS = 2000;
+
 let manager: CaptionSourceManager | null = null;
+let stabilizer: CaptionStabilizer | null = null;
 let overlay: TranslationOverlay | null = null;
 const abortManager = new AbortManager();
 let settings: Settings | null = null;
 let requestCounter = 0;
 let activeSource: CaptionSource | null = null;
+let lastTranslateTime = 0;
+const localCache = new Map<string, string>();
 
 async function loadSettings(): Promise<Settings> {
   return new Promise((resolve) => {
@@ -46,13 +53,33 @@ async function initialize(): Promise<void> {
   });
   overlay.mount();
 
-  manager = new CaptionSourceManager(onCaption);
+  stabilizer = new CaptionStabilizer(
+    onCaption,
+    (raw) => overlay?.show(raw, true)
+  );
+
+  manager = new CaptionSourceManager((text, lang, source) =>
+    stabilizer!.feed(text, lang, source)
+  );
   activeSource = await manager.start();
   console.log(`[YT Translator] Caption source: ${activeSource}`);
 }
 
 function onCaption(text: string, lang: string | null, _source: CaptionSource): void {
   if (!overlay || !settings) return;
+
+  // Check content-side cache before opening a translation port
+  const cacheKey = `${text}|${settings.targetLang}`;
+  const cached = localCache.get(cacheKey);
+  if (cached) {
+    overlay.show(cached);
+    return;
+  }
+
+  // Throttle: skip if a translation was sent too recently
+  const now = Date.now();
+  if (now - lastTranslateTime < MIN_TRANSLATE_INTERVAL_MS) return;
+  lastTranslateTime = now;
 
   const requestId = String(++requestCounter);
   const ctrl = abortManager.create("translate");
@@ -75,10 +102,18 @@ function onCaption(text: string, lang: string | null, _source: CaptionSource): v
       case "TRANSLATE_PARTIAL":
         overlay!.show(message.partial ?? "", true);
         break;
-      case "TRANSLATE_RESPONSE":
-        overlay!.show(message.translated ?? "");
+      case "TRANSLATE_RESPONSE": {
+        const translated = message.translated ?? "";
+        if (translated) {
+          if (localCache.size >= LOCAL_CACHE_MAX) {
+            localCache.delete(localCache.keys().next().value!);
+          }
+          localCache.set(cacheKey, translated);
+        }
+        overlay!.show(translated);
         port.disconnect();
         break;
+      }
       case "TRANSLATE_ERROR":
         console.warn("[YT Translator] Translation error:", message.error);
         port.disconnect();
@@ -102,6 +137,8 @@ function onCaption(text: string, lang: string | null, _source: CaptionSource): v
 function cleanup(): void {
   manager?.stop();
   manager = null;
+  stabilizer?.reset();
+  stabilizer = null;
   overlay?.unmount();
   overlay = null;
   abortManager.abortAll();
