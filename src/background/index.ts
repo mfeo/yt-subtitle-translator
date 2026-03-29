@@ -147,7 +147,6 @@ function mergeSettings(base: Settings, patch: Partial<Settings>): Settings {
     ...patch,
     ollama: { ...base.ollama, ...(patch.ollama ?? {}) },
     whisper: { ...base.whisper, ...(patch.whisper ?? {}) },
-    cloud: { ...base.cloud, ...(patch.cloud ?? {}) },
     display: { ...base.display, ...(patch.display ?? {}) },
   };
 }

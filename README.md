@@ -7,7 +7,7 @@ A Chrome extension that translates YouTube subtitles in real-time using a three-
 - **Three-layer caption fallback**: TimedText API → DOM observer → Audio capture + Whisper STT
 - **Local LLM translation**: Ollama with streaming support (default: `qwen2.5:3b`)
 - **Whisper STT fallback**: For videos without any captions (`whisper.cpp` or Groq API)
-- **Multiple translation backends**: Ollama (local), YouTube Native captions, Cloud (DeepL / OpenAI GPT-4o mini)
+- **Multiple translation backends**: Ollama (local), YouTube Native captions
 - **Overlay UI**: Translated subtitles displayed as a non-intrusive overlay with configurable font size and opacity
 - **Popup settings**: Quick toggle and backend/display configuration without leaving YouTube
 
@@ -46,12 +46,11 @@ Open the extension popup on any YouTube tab to configure:
 
 | Setting | Options | Default |
 |---|---|---|
-| Translation backend | `ollama` / `youtube-native` / `cloud` | `ollama` |
+| Translation backend | `ollama` / `youtube-native` | `ollama` |
 | Ollama host | URL | `http://localhost:11434` |
 | Ollama model | any pulled model | `qwen2.5:3b` |
 | Whisper provider | `whisper-cpp` / `groq` | `whisper-cpp` |
 | Whisper host | URL | `http://localhost:8080` |
-| Cloud provider | `deepl` / `openai` | `deepl` |
 | Target language | BCP-47 tag | `zh-TW` |
 | Font size | `small` / `medium` / `large` | `medium` |
 | Opacity | 0.2 – 1.0 | `0.85` |
@@ -80,7 +79,7 @@ Open the extension popup on any YouTube tab to configure:
 │  │  translator.ts + cache   │   │
 │  │  ┌────────┬────────────┐ │   │
 │  │  │ Ollama │ YT Native  │ │   │
-│  │  │ Cloud  │ Whisper    │ │   │
+│  │  │        │ Whisper    │ │   │
 │  │  └────────┴────────────┘ │   │
 │  └──────────────────────────┘   │
 └─────────────────────────────────┘
@@ -104,7 +103,6 @@ Open the extension popup on any YouTube tab to configure:
 src/
 ├── background/
 │   ├── backends/
-│   │   ├── cloud.ts          # DeepL / OpenAI translation
 │   │   ├── ollama.ts         # Ollama streaming translation
 │   │   ├── types.ts          # TranslationBackend interface
 │   │   └── youtube-native.ts # YouTube caption pass-through

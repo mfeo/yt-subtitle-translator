@@ -31,6 +31,6 @@ export interface TimedTextTrack {
 
 export type CaptionSource = "timedtext" | "dom" | "whisper";
 
-export type TranslationBackendName = "ollama" | "youtube-native" | "cloud";
+export type TranslationBackendName = "ollama" | "youtube-native";
 
 export type WhisperProvider = "ollama-whisper" | "whisper-cpp" | "groq";

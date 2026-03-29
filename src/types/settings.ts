@@ -13,10 +13,6 @@ export interface Settings {
     host: string;
     groqApiKey: string;
   };
-  cloud: {
-    provider: "deepl" | "openai";
-    apiKey: string;
-  };
   display: {
     fontSize: "small" | "medium" | "large";
     opacity: number;
@@ -35,10 +31,6 @@ export const DEFAULT_SETTINGS: Settings = {
     provider: "whisper-cpp",
     host: "http://localhost:8080",
     groqApiKey: "",
-  },
-  cloud: {
-    provider: "deepl",
-    apiKey: "",
   },
   display: {
     fontSize: "medium",

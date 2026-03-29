@@ -38,7 +38,6 @@ function getDefaultSettings(): Settings {
     translationBackend: "ollama",
     ollama: { host: "http://localhost:11434", model: "qwen2.5:3b" },
     whisper: { provider: "whisper-cpp", host: "http://localhost:8080", groqApiKey: "" },
-    cloud: { provider: "deepl", apiKey: "" },
     display: { fontSize: "medium", opacity: 0.85 },
   };
 }

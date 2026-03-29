@@ -15,8 +15,6 @@
     "http://localhost:11434/*",
     "http://localhost:8080/*",
     "https://api.groq.com/*",
-    "https://api.deepl.com/*",
-    "https://api.openai.com/*",
     "https://*.youtube.com/*"
   ],
   "background": {

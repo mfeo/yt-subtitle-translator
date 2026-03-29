@@ -81,12 +81,6 @@ async function init(): Promise<void> {
   if (whisperHost) whisperHost.value = s.whisper.host;
   if (groqKey) groqKey.value = s.whisper.groqApiKey;
 
-  // Cloud config
-  const cloudProvider = $select("cloud-provider");
-  const cloudKey = $input("cloud-api-key");
-  if (cloudProvider) cloudProvider.value = s.cloud.provider;
-  if (cloudKey) cloudKey.value = s.cloud.apiKey;
-
   // Display
   const fontSizeSel = $select("font-size");
   const opacityInput = $input("opacity");
@@ -128,10 +122,6 @@ async function init(): Promise<void> {
         host: whisperHost?.value ?? "http://localhost:8080",
         groqApiKey: groqKey?.value ?? "",
       },
-      cloud: {
-        provider: (cloudProvider?.value ?? "deepl") as Settings["cloud"]["provider"],
-        apiKey: cloudKey?.value ?? "",
-      },
       display: {
         fontSize: (fontSizeSel?.value ?? "medium") as Settings["display"]["fontSize"],
         opacity: parseFloat(opacityInput?.value ?? "0.85"),
@@ -149,9 +139,7 @@ async function init(): Promise<void> {
 
 function updateBackendVisibility(backend: TranslationBackendName): void {
   const ollamaSection = $("ollama-section");
-  const cloudSection = $("cloud-section");
   if (ollamaSection) ollamaSection.hidden = backend !== "ollama";
-  if (cloudSection) cloudSection.hidden = backend !== "cloud";
 }
 
 function updateWhisperVisibility(provider: Settings["whisper"]["provider"]): void {
