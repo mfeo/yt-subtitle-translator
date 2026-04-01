@@ -21,6 +21,13 @@ body {
   border-bottom: 1px solid #0f3460;
 }
 
+.header-logo {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
 .header h1 {
   font-size: 15px;
   font-weight: 600;

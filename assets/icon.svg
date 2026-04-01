@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Background rounded square -->
+  <rect width="128" height="128" rx="24" ry="24" fill="#e94560"/>
+
+  <!-- Subtitle bars at bottom (representing captions) -->
+  <rect x="16" y="84" width="96" height="8" rx="4" fill="white" opacity="0.35"/>
+  <rect x="20" y="86" width="50" height="4" rx="2" fill="white"/>
+  <rect x="74" y="86" width="24" height="4" rx="2" fill="white" opacity="0.65"/>
+  <rect x="16" y="96" width="96" height="8" rx="4" fill="white" opacity="0.2"/>
+  <rect x="20" y="98" width="36" height="4" rx="2" fill="white" opacity="0.55"/>
+
+  <!-- Letter A (Latin) -->
+  <path d="M24 70 L34 38 L44 70 M28 58 L40 58" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Arrow right -->
+  <line x1="52" y1="54" x2="72" y2="54" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <path d="M65 46 L73 54 L65 62" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Chinese character "文" (wén) - composed of geometric strokes -->
+  <!-- Top horizontal stroke -->
+  <line x1="82" y1="38" x2="104" y2="38" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <!-- Center vertical dot/tick -->
+  <line x1="93" y1="38" x2="93" y2="46" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <!-- Middle horizontal stroke -->
+  <line x1="80" y1="50" x2="106" y2="50" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <!-- Left diagonal down -->
+  <path d="M93 50 L80 70" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <!-- Right diagonal down -->
+  <path d="M93 50 L106 70" stroke="white" stroke-width="5" stroke-linecap="round"/>
+</svg>

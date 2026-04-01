@@ -33,6 +33,10 @@ whisper-run-cuda: (model model_name)
       -v ./{{ model_dir }}:/models \
       {{ whisper_image }}-cuda
 
+# Generate extension icons from SVG source
+icons:
+    bun run scripts/generate-icons.ts
+
 # Verify whisper server is running
 whisper-verify:
     curl http://localhost:{{ whisper_port }}/inference -F "file=@/dev/null" -F "response_format=json"
