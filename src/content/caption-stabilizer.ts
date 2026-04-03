@@ -1,10 +1,11 @@
 import type { CaptionSource } from "../types/index.js";
 
-type StableCallback = (text: string, lang: string | null, source: CaptionSource) => void;
+type StableCallback = (text: string, lang: string | null, source: CaptionSource, isScrolling: boolean) => void;
 export class CaptionStabilizer {
   private pendingText: string | null = null;
   private pendingLang: string | null = null;
   private pendingSource: CaptionSource | null = null;
+  private pendingIsScrolling = false;
   private stableTimer: ReturnType<typeof setTimeout> | null = null;
   private lastStableText = "";
   private lastFedText = "";
@@ -18,6 +19,7 @@ export class CaptionStabilizer {
     this.pendingText = text;
     this.pendingLang = lang;
     this.pendingSource = source;
+    this.pendingIsScrolling = isScrolling;
 
     if (this.stableTimer) {
       clearTimeout(this.stableTimer);
@@ -76,7 +78,7 @@ export class CaptionStabilizer {
     }
     if (this.pendingText && this.pendingText !== this.lastStableText) {
       this.lastStableText = this.pendingText;
-      this.onStable(this.pendingText, this.pendingLang, this.pendingSource!);
+      this.onStable(this.pendingText, this.pendingLang, this.pendingSource!, this.pendingIsScrolling);
     }
   }
 }

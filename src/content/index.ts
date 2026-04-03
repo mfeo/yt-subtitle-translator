@@ -75,7 +75,7 @@ async function initialize(): Promise<void> {
   }
 }
 
-function onCaption(text: string, lang: string | null, _source: CaptionSource): void {
+function onCaption(text: string, lang: string | null, _source: CaptionSource, isScrolling: boolean): void {
   if (!overlay || !settings || !isContextValid()) return;
 
   // Check content-side cache before opening a translation port
@@ -86,10 +86,12 @@ function onCaption(text: string, lang: string | null, _source: CaptionSource): v
     return;
   }
 
-  // Throttle: skip if a translation was sent too recently
-  const now = Date.now();
-  if (now - lastTranslateTime < MIN_TRANSLATE_INTERVAL_MS) return;
-  lastTranslateTime = now;
+  // Throttle: skip if a translation was sent too recently (scrolling captions only)
+  if (isScrolling) {
+    const now = Date.now();
+    if (now - lastTranslateTime < MIN_TRANSLATE_INTERVAL_MS) return;
+    lastTranslateTime = now;
+  }
 
   const requestId = String(++requestCounter);
   const ctrl = abortManager.create("translate");
