@@ -107,6 +107,8 @@ chrome.runtime.onMessage.addListener(
 
       case "GET_SETTINGS": {
         sendResponse({ success: true, data: settings });
+        // Pre-create offscreen document so it's ready when the user starts audio capture
+        ensureOffscreenDocument().catch(() => {});
         return false;
       }
 

@@ -15,8 +15,11 @@ interface OllamaGenerateChunk {
   done: boolean;
 }
 
+const AVAILABILITY_CACHE_TTL_MS = 30_000;
+
 export class OllamaBackend implements TranslationBackend {
   readonly name = "ollama";
+  private availabilityCache: { result: boolean; expiresAt: number } | null = null;
 
   constructor(
     private host: string,
@@ -112,10 +115,17 @@ export class OllamaBackend implements TranslationBackend {
   }
 
   async isAvailable(): Promise<boolean> {
+    const now = Date.now();
+    if (this.availabilityCache && now < this.availabilityCache.expiresAt) {
+      return this.availabilityCache.result;
+    }
     try {
       const resp = await fetch(`${this.host}/api/tags`, { signal: AbortSignal.timeout(3000) });
-      return resp.ok;
+      const result = resp.ok;
+      this.availabilityCache = { result, expiresAt: now + AVAILABILITY_CACHE_TTL_MS };
+      return result;
     } catch {
+      this.availabilityCache = null;
       return false;
     }
   }
@@ -123,5 +133,6 @@ export class OllamaBackend implements TranslationBackend {
   updateConfig(host: string, model: string): void {
     (this as { host: string }).host = host;
     (this as { model: string }).model = model;
+    this.availabilityCache = null;
   }
 }

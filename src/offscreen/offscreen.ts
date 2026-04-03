@@ -1,6 +1,6 @@
 import type { AudioChunkMessage, StartOffscreenCaptureMessage } from "../types/messages.js";
 
-const CHUNK_INTERVAL_MS = 4000;
+const CHUNK_INTERVAL_MS = 2000;
 
 let stream: MediaStream | null = null;
 let recorder: MediaRecorder | null = null;
@@ -62,7 +62,7 @@ async function startCapture(streamId: string): Promise<void> {
   }, CHUNK_INTERVAL_MS);
 
   recorder.ondataavailable = async (event) => {
-    if (event.data.size < 1000) return;
+    if (event.data.size < 500) return;
     const wavBlob = await convertToWav(event.data);
     const base64 = await blobToBase64(wavBlob);
     const msg: AudioChunkMessage = {
