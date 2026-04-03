@@ -319,6 +319,17 @@ cmake --build build --config Release -j$(nproc)
 - The extension sends audio as `audio/webm` (captured via `chrome.tabCapture`). whisper.cpp server handles this format natively via ffmpeg; ensure your build includes ffmpeg support or convert to WAV if transcription fails.
 - For a simpler cloud alternative, use **Groq** instead: set Whisper provider to `groq` in the popup and enter your Groq API key. No local server required.
 
+## Release
+
+Releases are automated via GitHub Actions. Pushing a `v*` tag triggers the release workflow: runs tests, builds the extension, packages it as a zip, and creates a GitHub Release.
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+> Note: `git push origin` without a tag name does **not** push tags and will not trigger the release workflow.
+
 ## License
 
 MIT
