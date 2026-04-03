@@ -20,16 +20,18 @@ export class CaptionSourceManager {
   private pollInterval: ReturnType<typeof setInterval> | null = null;
   private video: HTMLVideoElement | null = null;
   private callback: CaptionCallback;
+  private targetLang: string;
 
-  constructor(callback: CaptionCallback) {
+  constructor(callback: CaptionCallback, targetLang = "zh-TW") {
     this.callback = callback;
+    this.targetLang = targetLang;
   }
 
   async start(): Promise<CaptionSource | null> {
     // --- Layer 1: TimedText API ---
     try {
       const tracks = await fetchCaptionTracks();
-      const track = selectBestTrack(tracks);
+      const track = selectBestTrack(tracks, this.targetLang);
       if (track) {
         const timedText = await fetchTimedTextTrack(track.baseUrl);
         if (timedText && timedText.events.length > 0) {

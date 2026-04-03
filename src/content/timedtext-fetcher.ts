@@ -44,18 +44,22 @@ export async function fetchTimedTextTrack(
 
 /**
  * Pick the best caption track for translation:
- * prefer English, then any non-zh-TW track.
+ * prefer English, then any track whose primary language tag differs from targetLang.
  */
-export function selectBestTrack(tracks: CaptionTrack[]): CaptionTrack | null {
+export function selectBestTrack(tracks: CaptionTrack[], targetLang = "zh-TW"): CaptionTrack | null {
   if (tracks.length === 0) return null;
+
+  const targetPrimary = targetLang.split("-")[0].toLowerCase();
 
   // Prefer en tracks
   const en = tracks.find((t) => t.languageCode.startsWith("en"));
   if (en) return en;
 
-  // Avoid already-translated zh-TW
-  const notZhTw = tracks.find((t) => !t.languageCode.startsWith("zh"));
-  if (notZhTw) return notZhTw;
+  // Avoid tracks already in the target language
+  const notTarget = tracks.find(
+    (t) => t.languageCode.split("-")[0].toLowerCase() !== targetPrimary
+  );
+  if (notTarget) return notTarget;
 
   return tracks[0] ?? null;
 }

@@ -66,8 +66,9 @@ async function initialize(): Promise<void> {
 
   stabilizer = new CaptionStabilizer(onCaption);
 
-  manager = new CaptionSourceManager((text, lang, source, isScrolling) =>
-    stabilizer!.feed(text, lang, source, isScrolling)
+  manager = new CaptionSourceManager(
+    (text, lang, source, isScrolling) => stabilizer!.feed(text, lang, source, isScrolling),
+    settings.targetLang
   );
   activeSource = await manager.start();
   if (activeSource) {
@@ -75,8 +76,18 @@ async function initialize(): Promise<void> {
   }
 }
 
+function isSameLanguage(source: string, target: string): boolean {
+  return source.split("-")[0].toLowerCase() === target.split("-")[0].toLowerCase();
+}
+
 function onCaption(text: string, lang: string | null, _source: CaptionSource, isScrolling: boolean): void {
   if (!overlay || !settings || !isContextValid()) return;
+
+  // Skip translation if source language matches target language
+  if (lang && isSameLanguage(lang, settings.targetLang)) {
+    overlay.show(text);
+    return;
+  }
 
   // Check content-side cache before opening a translation port
   const cacheKey = `${text}|${settings.targetLang}`;
